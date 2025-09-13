@@ -1,0 +1,91 @@
+#include <iostream>
+using namespace std;
+
+struct Pila {
+    int capacidadMaxima;
+    int indiceTope;
+    int elementos[100];
+    bool banderaEstado;
+
+    bool pilaVacia(int indiceTope, bool &banderaEstado) {
+        banderaEstado = (indiceTope == 0);
+        return banderaEstado;
+    }
+
+    bool pilaLlena(int indiceTope, int capacidadMaxima, bool &banderaEstado) {
+        banderaEstado = (indiceTope == capacidadMaxima);
+        return banderaEstado;
+    }
+
+    void pushElemento(int &indiceTope, int capacidadMaxima, int elementos[], int nuevoElemento, bool &banderaEstado) {
+        pilaLlena(indiceTope, capacidadMaxima, banderaEstado);
+        if (banderaEstado) {
+            cout << "Desbordamiento, la pila está llena.\n";
+        } else {
+            indiceTope++;
+            elementos[indiceTope] = nuevoElemento;
+            cout << "Elemento " << nuevoElemento << " agregado.\n";
+        }
+    }
+
+    void popElemento(int elementos[], int &indiceTope, bool &banderaEstado) {
+        pilaVacia(indiceTope, banderaEstado);
+        if (banderaEstado) {
+            cout << "Subdesbordamiento, la pila está vacía.\n";
+        } else {
+            cout << "Elemento eliminado: " << elementos[indiceTope] << "\n";
+            indiceTope--;
+        }
+    }
+
+    void mostrarPila(int elementos[], int indiceTope) {
+        if (indiceTope == 0) {
+            cout << "La pila está vacía.\n";
+        } else {
+            cout << "Contenido actual de la pila:\n";
+            for (int i = indiceTope; i >= 1; i--) {
+                cout << "| " << elementos[i] << " |\n";
+            }
+        }
+    }
+};
+
+int main() {
+    Pila pila;
+    cout << "Ingrese tamaño máximo de la pila: ";
+    cin >> pila.capacidadMaxima;
+    pila.indiceTope = 0;
+    pila.banderaEstado = false;
+
+    int opcionMenu, valorIngresado;
+    do {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Agregar (push)\n";
+        cout << "2. Eliminar (pop)\n";
+        cout << "3. Ver pila\n";
+        cout << "0. Salir\n";
+        cout << "Opcion: ";
+        cin >> opcionMenu;
+
+        switch (opcionMenu) {
+            case 1:
+                cout << "Ingrese valor: ";
+                cin >> valorIngresado;
+                pila.pushElemento(pila.indiceTope, pila.capacidadMaxima, pila.elementos, valorIngresado, pila.banderaEstado);
+                break;
+            case 2:
+                pila.popElemento(pila.elementos, pila.indiceTope, pila.banderaEstado);
+                break;
+            case 3:
+                pila.mostrarPila(pila.elementos, pila.indiceTope);
+                break;
+            case 0:
+                cout << "Saliendo...\n";
+                break;
+            default:
+                cout << "Opción inválida.\n";
+        }
+    } while (opcionMenu != 0);
+
+    return 0;
+}
