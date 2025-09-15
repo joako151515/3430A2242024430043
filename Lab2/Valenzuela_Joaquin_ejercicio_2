@@ -1,0 +1,119 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <cstdlib>
+using namespace std;
+
+int main(int cantidadArgumentos, char* vectorArgumentos[]) {
+    if (cantidadArgumentos < 3) {
+        cout << "Uso: " << vectorArgumentos[0] << " <alturaMaxima> <cantidadPilas>\n";
+        return 1;
+    }
+
+    int alturaMaxima = atoi(vectorArgumentos[1]);
+    int cantidadPilas = atoi(vectorArgumentos[2]);
+
+    vector<stack<int>> puerto(cantidadPilas);
+    int opcionMenu;
+    int identificadorContenedor;
+    int siguienteIdentificadorContenedor = 1;
+
+    do {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Ingresar contenedor (automático)\n";
+        cout << "2. Ingresar contenedor (manual)\n";
+        cout << "3. Retirar contenedor\n";
+        cout << "4. Ver estado de las pilas\n";
+        cout << "0. Salir\n";
+        cout << "Opcion: ";
+        cin >> opcionMenu;
+
+        switch (opcionMenu) {
+            case 1: {
+                bool contenedorColocado = false;
+                for (int indicePila = 0; indicePila < cantidadPilas; indicePila++) {
+                    if ((int)puerto[indicePila].size() < alturaMaxima) {
+                        puerto[indicePila].push(siguienteIdentificadorContenedor);
+                        cout << "Contenedor " << siguienteIdentificadorContenedor << " colocado en pila " << indicePila+1 << ".\n";
+                        siguienteIdentificadorContenedor++;
+                        contenedorColocado = true;
+                        break;
+                    }
+                }
+                if (!contenedorColocado) cout << "No hay espacio disponible en el puerto.\n";
+                break;
+            }
+            case 2: {
+                cout << "Ingrese ID del contenedor: ";
+                cin >> identificadorContenedor;
+                bool contenedorColocado = false;
+                for (int indicePila = 0; indicePila < cantidadPilas; indicePila++) {
+                    if ((int)puerto[indicePila].size() < alturaMaxima) {
+                        puerto[indicePila].push(identificadorContenedor);
+                        cout << "Contenedor " << identificadorContenedor << " colocado en pila " << indicePila+1 << ".\n";
+                        contenedorColocado = true;
+                        break;
+                    }
+                }
+                if (!contenedorColocado) cout << "No hay espacio disponible en el puerto.\n";
+                break;
+            }
+            case 3: {
+                cout << "Ingrese ID del contenedor a retirar: ";
+                cin >> identificadorContenedor;
+                bool contenedorEncontrado = false;
+                for (int indicePila = 0; indicePila < cantidadPilas; indicePila++) {
+                    stack<int> pilaTemporal;
+                    while (!puerto[indicePila].empty()) {
+                        int contenedorSuperior = puerto[indicePila].top();
+                        if (contenedorSuperior == identificadorContenedor) {
+                            puerto[indicePila].pop();
+                            cout << "Contenedor " << identificadorContenedor << " retirado de pila " << indicePila+1 << ".\n";
+                            contenedorEncontrado = true;
+                            break;
+                        } else {
+                            pilaTemporal.push(contenedorSuperior);
+                            puerto[indicePila].pop();
+                            cout << "Moviendo contenedor " << contenedorSuperior << " a pila auxiliar...\n";
+                        }
+                    }
+                    while (!pilaTemporal.empty()) {
+                        puerto[indicePila].push(pilaTemporal.top());
+                        pilaTemporal.pop();
+                    }
+                    if (contenedorEncontrado) break;
+                }
+                if (!contenedorEncontrado) cout << "El contenedor " << identificadorContenedor << " no está en el puerto.\n";
+                break;
+            }
+            case 4: {
+                cout << "\nEstado de las pilas:\n";
+                for (int indicePila = 0; indicePila < cantidadPilas; indicePila++) {
+                    cout << "Pila " << indicePila+1 << ": ";
+                    if (puerto[indicePila].empty()) {
+                        cout << "(vacía)";
+                    } else {
+                        stack<int> copiaPila = puerto[indicePila];
+                        vector<int> contenedoresDeLaPila;
+                        while (!copiaPila.empty()) {
+                            contenedoresDeLaPila.push_back(copiaPila.top());
+                            copiaPila.pop();
+                        }
+                        for (int j = contenedoresDeLaPila.size()-1; j >= 0; j--) {
+                            cout << contenedoresDeLaPila[j] << " ";
+                        }
+                    }
+                    cout << "\n";
+                }
+                break;
+            }
+            case 0:
+                cout << "Saliendo del programa...\n";
+                break;
+            default:
+                cout << "Opcion no valida.\n";
+        }
+    } while (opcionMenu != 0);
+
+    return 0;
+}
